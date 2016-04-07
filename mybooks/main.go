@@ -9,7 +9,7 @@ import (
     "io/ioutil"
     "strings"
     "github.com/chzyer/readline"
-    "github.com/derlin/book"
+    "github.com/derlin/mybooks/book"
     "regexp"
 )
 

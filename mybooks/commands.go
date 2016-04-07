@@ -2,8 +2,8 @@ package main
 
 import (
     "fmt"
-    "github.com/derlin/book"
-    "github.com/derlin/rl"
+    "github.com/derlin/mybooks/book"
+    "github.com/derlin/mybooks/rl"
     "strconv"
 )
 
