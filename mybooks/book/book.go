@@ -26,6 +26,10 @@ func (b *Book) MatchTitle(search ... string) bool{
     return Match(b.Title, search...)
 }
 
+func (b *Book) MatchDate(search ... string) bool{
+    return Match(b.DateRead, search...)
+}
+
 func (b *Book) MatchAny(search ... string) bool{
     return  b.MatchTitle(search...) || 
             b.MatchAuthor(search...) ||

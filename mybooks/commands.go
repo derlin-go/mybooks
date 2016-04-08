@@ -41,6 +41,11 @@ func search(books Books, unused Index, args ... string) (bool, Index){
         args = args[1:]
     }
 
+    if(args[0] == "date"){
+        f = (*book.Book).MatchDate
+        args = args[1:]
+    }
+
     indexes := make([]string, 0)
     i := 1
 
@@ -107,6 +112,22 @@ func addBook(books Books, idx Index, args ... string) (bool, Index){
 
 // ---------
 
+func saveFile(books Books, index Index, args ... string) (bool, Index){
+
+    err := WriteFile(path, books)
+
+    if err == nil {
+        fmt.Println("file saved.")
+
+    }else {
+        fmt.Printf("Error saving file(%s)\n", err)
+    }
+
+    return true, index
+
+}
+
+// ---------
 
 func deleteBook(books Books, index Index, args ... string) (bool, Index){
 

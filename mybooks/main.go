@@ -16,7 +16,7 @@ import (
 
 const (
     FOLDER_PATH = "/Applications/MyBooks"
-    FILENAME = "mybooks-v2.json"
+    FILENAME = "mybooks.json"
 )
 
 
@@ -24,9 +24,23 @@ const (
 
 // -----------------------------------
 
+// func main(){
+//     path, _ := GetFilePath("mybooks.json")
+
+//     fmt.Println(path)
+//     bs := FromJson(path)
+//     fmt.Println(len(bs))
+//     books := make(Books)
+//     for k, v := range bs {
+//         books[normalizeKey(k)] = v
+//     }
+//     path, _ = GetFilePath("mybooks-v2.json")
+//     WriteFile(path, books)
+//     fmt.Println("done")
+// }
 
 func main1(){
-    path, err := GetFilePath()
+    path, err := GetFilePath(FILENAME)
     fmt.Println(path)
     fmt.Println(err)
     books := FromJson(path)
@@ -54,13 +68,17 @@ var cmdMap map[string]CommandFunc = map[string]CommandFunc{
     "details" : showDetails,
     "show" : showDetails,
     "delete" : deleteBook,
+    "save" : saveFile,
 }
+
+var path string
 
 // -------------
 
 func main() {
 
-    path, _ := GetFilePath()
+    path, _ = GetFilePath(FILENAME)
+
     var books Books
     books = FromJson(path)
     index := Index{}
@@ -103,16 +121,29 @@ func main() {
 
 // ============================================ utils
 
-var multSpacesRegex *regexp.Regexp = regexp.MustCompile(" +")
+var repl *strings.Replacer = strings.NewReplacer(
+        "é", "e",
+        "è", "e",
+        "ê", "e",
+        "à", "a",
+        "ç", "c",
+        "ù", "u",
+        "û", "u")
+var r_specialChars *regexp.Regexp = regexp.MustCompile("[^a-z0-9 ]")
+var r_multispaces *regexp.Regexp = regexp.MustCompile(" +")
 
 func normalizeKey(str string) string{
+
     str = strings.ToLower(str)
-    str = multSpacesRegex.ReplaceAllString(str, " ")
+    str = repl.Replace(str)
+    str = r_specialChars.ReplaceAllString(str, " ")
+    str = r_multispaces.ReplaceAllString(str, " ")
     str = strings.TrimSpace(str)
+
     return str
 }
 
-func GetFilePath() (string, error) {
+func GetFilePath(name string) (string, error) {
     user, err := user.Current()
     if err != nil {
         return "", err
@@ -130,12 +161,13 @@ func GetFilePath() (string, error) {
             return "", err
         }
     }
-    return path, nil
+    return filepath.Join(path, name), nil
 }
 
 
-func FromJson(path string) map[string]book.Book {
-    file, err := os.Open(filepath.Join(path, FILENAME))
+func FromJson(path string) Books {
+    file, err := os.Open(path)
+
     books := make(map[string]book.Book)
     if err != nil {
         fmt.Println("WARNING: file does not exist")
@@ -161,5 +193,5 @@ func WriteFile(path string, books Books) error {
         return err
     }
 
-    return ioutil.WriteFile(filepath.Join(path, FILENAME), []byte(str), 0777)
+    return ioutil.WriteFile(path, []byte(str), 0777)
 }
