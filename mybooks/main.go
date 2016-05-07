@@ -58,18 +58,24 @@ func main1(){
 
 type Index []string
 type Books map[string]book.Book
+
 type CommandFunc func (books Books, index Index, args ... string) (bool, Index)
 
+type Command struct {
+    F CommandFunc  // the function to call
+    Args string    // a description of the expected arguments 
+    Details string // the detailed description of this command
+}
 
-var cmdMap map[string]CommandFunc = map[string]CommandFunc{
-    "list" : list,
-    "add" : addBook,
-    "search" : search,
-    "details" : showDetails,
-    "show" : showDetails,
-    "delete" : deleteBook,
-    "save" : saveFile,
-    'help': printHelp
+var cmdMap map[string]Command = map[string]Command{
+    "list" : { list, "", "list all the books"},
+    "add" : {addBook, "", "add a book interactively. Use the save command afterwards to perenise your changes" },
+    "search" : {search, "[author|title|date] word [word,]", "search for specified word. Use one of the keywords author, title or date as first argument to limit your search to this field." },
+    "find" : {search, "[author|title|date] word [word,]", "search for specified word. Use one of the keywords author, title or date as first argument to limit your search to this field." },
+    "details" : { showDetails, "nbr", "show the details of the book at the specified index number" },
+    "show" : { showDetails, "nbr", "show the details of the book at the specified index number." },
+    "delete" : { deleteBook, "nbr", "delete the book at the specified index" },
+    "save" : { saveFile, "", "save the changes to dropbox. Must explicitely be called !" },
 }
 
 var path string
@@ -106,8 +112,13 @@ func main() {
             break
         }
 
-        if f, ok := cmdMap[cmd]; ok {
-            if res, idx := f(books, index, args...); res {
+        if cmd == "help" {
+            printHelp(args)
+            continue
+        }
+
+        if c, ok := cmdMap[cmd]; ok {
+            if res, idx := c.F(books, index, args...); res {
                 index = idx
             }
         }else{
@@ -121,6 +132,29 @@ func main() {
 
 
 // ============================================ utils
+
+func printHelp(args []string) {
+
+    if len(args) == 0 {
+        // no extra arg: print the list of available commands
+        for k, v := range cmdMap {
+            fmt.Printf("  %s %s\n", k, v.Args)
+        }
+        return
+    }
+        
+    // one command specified: print details if exists.
+    var arg0 = args[0]
+    if c, ok := cmdMap[arg0]; ok {
+        fmt.Printf(" %s %s", arg0,  c.Args);
+        fmt.Println("   " + c.Details);
+
+    }else{
+        fmt.Printf("command '%s' does not exist. Try 'help'\n", arg0)
+    } 
+
+}
+
 
 var repl *strings.Replacer = strings.NewReplacer(
         "é", "e",
