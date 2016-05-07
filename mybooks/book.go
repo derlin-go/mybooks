@@ -1,9 +1,9 @@
-
-package book 
+package main 
 
 import (
     "fmt"
     "strings"
+    "regexp"
 )
 
 // ------------------------------------------
@@ -36,6 +36,19 @@ func (b *Book) MatchAny(search ... string) bool{
             Match(b.Notes, search...)
 }
 
+func Match(str string, search ... string) bool {
+    str = strings.ToLower(str)
+
+    for _, s := range search {
+        if strings.Contains(str, strings.ToLower(s)) {
+            return true
+        }
+    }
+    return false   
+}
+
+// ------- 
+
 func (b Book) String() string {
     str := fmt.Sprintf("'%s', %s", b.Title, b.Author)
 
@@ -48,15 +61,30 @@ func (b Book) String() string {
 
     return str + "."
 }
-// ------- 
 
-func Match(str string, search ... string) bool {
+
+// ------------------------------------------
+
+
+var repl *strings.Replacer = strings.NewReplacer(
+        "é", "e",
+        "è", "e",
+        "ê", "e",
+        "à", "a",
+        "ç", "c",
+        "ù", "u",
+        "û", "u")
+
+var r_specialChars *regexp.Regexp = regexp.MustCompile("[^a-z0-9 ]")
+var r_multispaces *regexp.Regexp = regexp.MustCompile(" +")
+
+func normalizeKey(str string) string{
+
     str = strings.ToLower(str)
+    str = repl.Replace(str)
+    str = r_specialChars.ReplaceAllString(str, " ")
+    str = r_multispaces.ReplaceAllString(str, " ")
+    str = strings.TrimSpace(str)
 
-    for _, s := range search {
-        if strings.Contains(str, strings.ToLower(s)) {
-            return true
-        }
-    }
-    return false   
+    return str
 }

@@ -2,8 +2,6 @@ package main
 
 import (
     "fmt"
-    "github.com/derlin/mybooks/book"
-    "github.com/derlin/mybooks/rl"
     "strconv"
 )
 
@@ -30,19 +28,19 @@ func search(books Books, unused Index, args ... string) (bool, Index){
         return false, nil
     }
 
-    f := (*book.Book).MatchAny
+    f := (*Book).MatchAny
 
     if args[0] == "title" { 
-        f = (*book.Book).MatchTitle
+        f = (*Book).MatchTitle
         args = args[1:]
     }
     if args[0] == "author" { 
-        f = (*book.Book).MatchAuthor 
+        f = (*Book).MatchAuthor 
         args = args[1:]
     }
 
     if(args[0] == "date"){
-        f = (*book.Book).MatchDate
+        f = (*Book).MatchDate
         args = args[1:]
     }
 
@@ -69,7 +67,7 @@ func showDetails(books Books, index Index, args ... string) (bool, Index){
 
         // fmt.Printf(" Title: %s\n Author: %s\n Read on: %s\n Notes: %s\n\b", b.Title, b.Author, b.DateRead, b.Notes)
         fmt.Println(b)
-        return true, index
+        return true, nil
     }
     
     return false, nil
@@ -78,11 +76,11 @@ func showDetails(books Books, index Index, args ... string) (bool, Index){
 
 // ---------
 
-func addBook(books Books, idx Index, args ... string) (bool, Index){
+func addBook(books Books, unused Index, args ... string) (bool, Index){
     var err error
-    book := book.Book{}
+    book := Book{}
 
-    book.Title, err = rl.Readline(" Title: ")
+    book.Title, err = Readline(" Title: ")
     if err != nil || book.Title == "" {
         fmt.Println("Title is mandatory. Aborting.")
         return false, nil
@@ -93,37 +91,39 @@ func addBook(books Books, idx Index, args ... string) (bool, Index){
         return false, nil
     }
 
-    book.Author, err = rl.Readline(" Author: ")
+    book.Author, err = Readline(" Author: ")
     if err != nil || book.Author == "" {
         fmt.Println("Author is mandatory. Aborting.")
         return false, nil
     }
 
 
-    book.DateRead, err = rl.Readline(" Date read: ")
+    book.DateRead, err = Readline(" Date read: ")
     if err != nil {  return false, nil; }
 
-    book.Notes = rl.ReadMultiLine(" Notes (use ctrl+D to stop): ")
+    book.Notes = ReadMultiLine(" Notes (use ctrl+D to stop): ")
 
     books[normalizeKey(book.Title)] = book // insert
     fmt.Printf(" -> Book '%s' (%s) inserted.\n", book.Title, book.Author)
-    return true, idx
+
+    return true, nil
 }
 
 // ---------
 
-func saveFile(books Books, index Index, args ... string) (bool, Index){
+func saveFile(books Books, unused Index, args ... string) (bool, Index){
 
     err := WriteFile(path, books)
 
     if err == nil {
         fmt.Printf("file saved to %s.\n", path)
+        return true, nil
 
     }else {
         fmt.Printf("Error saving file(%s)\n", err)
+        return false, nil
     }
 
-    return true, index
 
 }
 
@@ -138,7 +138,7 @@ func deleteBook(books Books, index Index, args ... string) (bool, Index){
         delete(books, normalizeKey(b.Title))
         //idx = append(idx[0:i-1], idx[i:]...) // remove from index
         fmt.Println("deleted " + b.Title)
-        return true, index
+        return true, nil
     }
 
     return false, nil

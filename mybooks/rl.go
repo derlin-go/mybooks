@@ -1,4 +1,4 @@
-package rl;
+package main;
 
 import (
     "fmt"
