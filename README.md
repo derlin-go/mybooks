@@ -10,7 +10,7 @@ To get more information about the project, have a look at the [Android applicati
 ### How to use
 
  - get the source: `go get github.com/derlin-go/mybooks`
- - build the program : `go build -o mybooks src/github.com/derlin/mybooks/*.go`
+ - build the program : `go build -o mybooks src/github.com/derlin-go/mybooks/*.go`
  - run it: `./mybooks`
  
 Once the program is started, you can use `help` to get a list of all the available commands. Don't forget
