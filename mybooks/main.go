@@ -15,7 +15,7 @@ import (
 
 
 const (
-    FOLDER_PATH = "/Applications/MyBooks"
+    FOLDER_PATH = "/Apps/MyBooks"
     FILENAME = "mybooks.json"
 )
 
@@ -69,6 +69,7 @@ var cmdMap map[string]CommandFunc = map[string]CommandFunc{
     "show" : showDetails,
     "delete" : deleteBook,
     "save" : saveFile,
+    'help': printHelp
 }
 
 var path string
@@ -192,6 +193,5 @@ func WriteFile(path string, books Books) error {
     if err != nil {
         return err
     }
-
     return ioutil.WriteFile(path, []byte(str), 0777)
 }

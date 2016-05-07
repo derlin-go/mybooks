@@ -117,7 +117,7 @@ func saveFile(books Books, index Index, args ... string) (bool, Index){
     err := WriteFile(path, books)
 
     if err == nil {
-        fmt.Println("file saved.")
+        fmt.Printf("file saved to %s.\n", path)
 
     }else {
         fmt.Printf("Error saving file(%s)\n", err)
@@ -135,7 +135,7 @@ func deleteBook(books Books, index Index, args ... string) (bool, Index){
     if i, ok := getIndex(args, index); ok {       
         b := books[index[i]]
 
-        delete(books, b.Title)
+        delete(books, normalizeKey(b.Title))
         //idx = append(idx[0:i-1], idx[i:]...) // remove from index
         fmt.Println("deleted " + b.Title)
         return true, index
